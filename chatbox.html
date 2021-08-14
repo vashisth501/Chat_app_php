@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <!-- Favicons -->
+    <link rel="icon" href="img/icons8-chat.gif">
+    <title>Chatbox</title>
+    <style>
+        body {
+            margin: 0 auto;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+
+        .container {
+            border: 2px solid #dedede;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .darker {
+            border-color: #ccc;
+            background-color: #ddd;
+        }
+
+        .container::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+
+        .container img {
+            float: left;
+            max-width: 60px;
+            width: 100%;
+            margin-right: 20px;
+            border-radius: 50%;
+        }
+
+        .container img.right {
+            float: right;
+            margin-left: 20px;
+            margin-right:0;
+        }
+
+        .time-right {
+            float: right;
+            color: #aaa;
+        }
+
+        .time-left {
+            float: left;
+            color: #999;
+        }
+        .scrollable-div{
+            height: 350px;
+            overflow-y: scroll;
+        }
+    </style>
+</head>
+<body>
+<?php
+include "navbar.html";
+?>
+<h2>Chat Messages - <?php  echo $roomName; ?></h2>
+<div class="container">
+    <div class="scrollable-div">
+
+    </div>
+</div>
+<input type="text" class="form-control" name="usrmsg" id="usrmsg" placeholder="Add Message">
+<br>
+<button class="btn btn-success" id="submitmsg"> Submit </button>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+<script>
+    // Check for Messages present for every second or that room
+    setInterval(runFunction,1000);
+    function runFunction(){
+        $.post("setcont.php",{room: '<?php echo $roomName ?>'},
+            function (data,status){
+             document.getElementsByClassName('scrollable-div')[0].innerHTML = data;
+            }
+        );
+    }
+    var entermsg = document.getElementById('usrmsg');
+    entermsg.addEventListener('keyup',function (){
+       event.preventDefault();
+       if (event.keyCode===13){
+           document.getElementById('submitmsg').click();
+       }
+    });
+    $("#submitmsg").click(function(){
+        var users_msg = $("#usrmsg").val();
+       $.post("savemsg.php",{text : users_msg, room: '<?php echo $roomName ?>',ip : '<?php echo $_SERVER["REMOTE_ADDR"] ?>'});
+        $("#usrmsg").val("");
+    }),
+    function(data,status){
+        document.getElementsByClassName('scrollable-div')[0].innerHTML = data;
+        return false;
+    };
+
+</script>
+</html>
